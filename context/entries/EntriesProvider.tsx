@@ -31,7 +31,7 @@ const Entries_INITIAL_STATE: EntriesState = {
     ],
 }
 
-export const EntriesProvider: FC = ({children}) => {
+export const EntriesProvider: FC = ({children}: any) => {
 
     const [state, dispatch] = useReducer(entriesReducer, Entries_INITIAL_STATE)
 

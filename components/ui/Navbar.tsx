@@ -13,7 +13,7 @@ export const Navbar = () => {
         <IconButton
           size='large'
           edge='start'
-          color='secondary'
+          color='primary'
           onClick={openSideMenu}>
           <MenuOutlinedIcon />
         </IconButton>
