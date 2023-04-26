@@ -12,26 +12,26 @@ const Entries_INITIAL_STATE: EntriesState = {
     entries: [
         {
             _id: uuidv4(),
-            description: 'Pendiente: Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
             status: 'pending',
             createdAt: Date.now(),
         },
         {
             _id: uuidv4(),
-            description: 'En progreso: Mollit et ut ea ullamco aliquip adipisicing Lorem culpa sint veniam cupidatat quis ipsum.',
+            description: 'Mollit et ut ea ullamco aliquip adipisicing Lorem culpa sint veniam cupidatat quis ipsum.',
             status: 'in-progress',
             createdAt: Date.now()-1000000,
         },
         {
             _id: uuidv4(),
-            description: 'Terminadas: Aliqua id et commodo in ut in laboris fugiat do ad consectetur cillum velit id.',
+            description: 'Aliqua id et commodo in ut in laboris fugiat do ad consectetur cillum velit id.',
             status: 'finished',
             createdAt: Date.now()- 100000,
         },
     ],
 }
 
-export const EntriesProvider: FC = ({children}: any) => {
+export const EntriesProvider = ( {children}:any) => {
 
     const [state, dispatch] = useReducer(entriesReducer, Entries_INITIAL_STATE)
 
