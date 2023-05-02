@@ -1,9 +1,8 @@
-import { Button, List, Paper } from "@mui/material"
+import { List, Paper } from "@mui/material"
 import { EntryCard } from "./EntryCard"
 import { EntryStatus } from "@/interfaces"
 import { DragEvent, FC, useContext, useMemo } from "react";
 import { EntriesContext } from '../../context/entries/EntriesContext';
-import RotateRightOutlinedIcon from '@mui/icons-material/RotateRightOutlined';
 import { UIContext } from "@/context/ui";
 import styles from './EntryList.module.css'
 

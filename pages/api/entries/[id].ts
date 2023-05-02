@@ -24,6 +24,8 @@ export default function handler(
             return updateEntry(req, res);
         case 'GET':
             return getEntry(req, res);
+        case 'DELETE':
+            return deleteEntry(req, res);
         default:
             return res.status(400).json({ message: 'End Point no válido ' + req.method });
 
@@ -82,3 +84,23 @@ const updateEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 
 
 }
+
+
+const deleteEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+
+    const {id} = req.query;
+
+    await db.connect();
+    
+    try {
+        const entryToDelete = await Entry.findByIdAndRemove(id);
+        res.status(200).json(entryToDelete!);
+
+    } catch (error: any) {
+        console.log(error);
+        await db.disconnect();
+        return res.status(400).json({ message: error.errors.status });
+    }
+
+}
+

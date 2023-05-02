@@ -5,6 +5,7 @@ import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import { ChangeEvent, useState, useContext } from 'react';
 import { EntriesContext } from '@/context/entries';
 import { UIContext } from '@/context/ui';
+import EntryPage from '@/pages/entries/[id]';
 
 
 export const NewEntry = () => {

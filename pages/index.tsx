@@ -1,7 +1,6 @@
 import { Layout } from '@/components/layouts'
-import { EntryCard, EntryList, NewEntry } from '@/components/ui'
-import { Card, CardContent, CardHeader, Grid, Typography, IconButton, Button, Icon } from '@mui/material';
-import RotateRightOutlinedIcon from '@mui/icons-material/RotateRightOutlined';
+import { EntryList, NewEntry } from '@/components/ui'
+import { Card, CardContent, CardHeader, Grid} from '@mui/material';
 
 
 export default function HomePage() {
