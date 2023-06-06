@@ -24,6 +24,7 @@ export const entriesReducer = (state: EntriesState, action: EntriesActionType): 
                 entries: state.entries.map(entry => {
                     if (entry._id === action.payload._id) {
                         entry.status = action.payload.status;
+                        entry.title = action.payload.title;
                         entry.description = action.payload.description;
                     }
                     return entry;

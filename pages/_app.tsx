@@ -5,17 +5,30 @@ import { darkTheme, lightTheme } from '../themes'
 import { UIProvider } from '../context/ui'
 import { EntriesProvider } from '@/context/entries'
 import { SnackbarProvider } from 'notistack';
+import { useState } from 'react'
+import { Navbar } from '@/components/ui'
 
 
 
 export default function App({ Component, pageProps }: AppProps) {
-  return (
 
+  const [themeMode, setThemeMode] = useState('light');
+  
+  const handleThemeChange = () => {
+    const newThemeMode = themeMode === 'light' ? 'dark' : 'light';
+    setThemeMode(newThemeMode);
+  };
+  
+  const theme = themeMode === 'dark' ? darkTheme : lightTheme;
+
+
+  return (
     <SnackbarProvider maxSnack={3}>
       <EntriesProvider>
         <UIProvider>
-          <ThemeProvider theme={lightTheme}>
+          <ThemeProvider theme={theme}>
             <CssBaseline />
+            <Navbar themeMode={themeMode} handleThemeChange={handleThemeChange}/>
             <Component {...pageProps} />
           </ThemeProvider>
         </UIProvider>

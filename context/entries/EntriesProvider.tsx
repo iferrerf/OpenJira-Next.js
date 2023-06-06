@@ -10,9 +10,7 @@ export interface EntriesState {
 
 
 const Entries_INITIAL_STATE: EntriesState = {
-    entries: [
-
-    ],
+    entries: [],
 }
 
 export const EntriesProvider = ({ children }: any) => {
@@ -21,10 +19,12 @@ export const EntriesProvider = ({ children }: any) => {
 
     const { enqueueSnackbar } = useSnackbar();
 
-    const addNewEntry = async (description: string) => {
+    const addNewEntry = async (title:string, description: string) => {
         try {
 
-            const { data } = await entriesAPI.post<Entry>('/entries', { description });
+            const { data } = await entriesAPI.post<Entry>('/entries', { title, description });
+
+            console.log(data)
 
             dispatch({ type: '[Entry] Add Entry', payload: data });
 
@@ -33,10 +33,10 @@ export const EntriesProvider = ({ children }: any) => {
         }
     }
 
-    const updateEntry = async ({ _id, description, status }: Entry, showSnackbar = false) => {
+    const updateEntry = async ({ _id, description, title, status }: Entry, showSnackbar = false) => {
         try {
 
-            const { data } = await entriesAPI.put<Entry>(`/entries/${_id}`, { description, status });
+            const { data } = await entriesAPI.put<Entry>(`/entries/${_id}`, {title, description, status });
 
             dispatch({ type: '[Entry] Entry-Updated', payload: data });
 
@@ -65,7 +65,6 @@ export const EntriesProvider = ({ children }: any) => {
     const deleteEntry = async (id: string) => {
         try {
             const { data } = await entriesAPI.delete<Entry>(`/entries/${id}`);
-            console.log(data)
             dispatch({ type: '[Entry] Delete-Entry', payload: data });
 
         } catch (error) {

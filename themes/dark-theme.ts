@@ -1,14 +1,20 @@
 import { createTheme } from '@mui/material';
-import { grey, red } from '@mui/material/colors';
+import { blue, grey, red, yellow } from '@mui/material/colors';
 
 export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     secondary: {
-      main: '#FFE900',
+      main: yellow[400],
     },
     error: {
-      main: red.A400,
+      main: red.A200,
+    },
+    primary: {
+      main: blue[400],
+    },
+    background: {
+      default: grey[800],
     },
   },
   components: {
@@ -18,9 +24,19 @@ export const darkTheme = createTheme({
       },
       styleOverrides: {
         root: {
-          backgroundColor: grey[900],
+          backgroundColor: grey[700],
         },
       },
     },
+    MuiCard: {
+      defaultProps: {
+        elevation: 1,
+      },
+      styleOverrides: {
+        root: {
+          backgroundColor: grey[700],
+        },
+      },
+    }
   },
 });

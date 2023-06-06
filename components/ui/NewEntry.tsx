@@ -5,7 +5,6 @@ import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import { ChangeEvent, useState, useContext } from 'react';
 import { EntriesContext } from '@/context/entries';
 import { UIContext } from '@/context/ui';
-import EntryPage from '@/pages/entries/[id]';
 
 
 export const NewEntry = () => {
@@ -14,22 +13,28 @@ export const NewEntry = () => {
 
     const { addNewEntry } = useContext(EntriesContext);
 
-    const [inputValue, setInputValue] = useState('');
+    const [inputValueTitle, setInputValueTitle] = useState('');
+    const [inputValueDesc, setInputValueDesc] = useState('');
 
     const [touched, setTouched] = useState(false);
 
-    const onTextFieldChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setInputValue(event.target.value);
+    const onTextFieldChangeTitle = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setInputValueTitle(event.target.value);
+    }
+
+    const onTextFieldChangeDesc = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setInputValueDesc(event.target.value);
     }
 
 
     const onSave = () => {
-        if (inputValue.trim().length <= 0) return;
-
-        addNewEntry(inputValue);
+        setTouched(!touched);
+        if (inputValueTitle.trim().length <= 0 || inputValueDesc.trim().length <= 0) return;
+        
+        addNewEntry(inputValueTitle, inputValueDesc);
         setIsAddingEntry(false);
-        setTouched(false);
-        setInputValue('');
+        setInputValueTitle('');
+        setInputValueDesc('');
     }
 
 
@@ -45,18 +50,30 @@ export const NewEntry = () => {
                                 autoFocus
                                 multiline
                                 label='Nueva Entrada'
-                                helperText={touched && inputValue.trim().length <= 0 && 'Ingrese una tarea'}
-                                error={touched && inputValue.trim().length <= 0}
-                                value={inputValue}
-                                onChange={onTextFieldChange}
-                                onBlur={() => setTouched(true)}
+                                helperText={touched && inputValueTitle.trim().length <= 0 && 'Ingrese un titulo'}
+                                error={touched && inputValueTitle.trim().length <= 0}
+                                value={inputValueTitle}
+                                onChange={onTextFieldChangeTitle}
+                                onBlur={() => setTouched(touched)}
                             />
 
-                            <Box display='flex' justifyContent='space-between' marginBottom={1}>
+                            <TextField
+                                fullWidth
+                                sx={{ marginTop: 2, marginBottom: 1 }}
+                                multiline
+                                label='Descripcion'
+                                helperText={touched && inputValueDesc.trim().length <= 0 && 'Ingrese una tarea'}
+                                error={touched && inputValueDesc.trim().length <= 0}
+                                value={inputValueDesc}
+                                onChange={onTextFieldChangeDesc}
+                                onBlur={() => setTouched(touched)}
+                            />
+
+                            <Box justifyContent='space-between' marginBottom={1} display='flex'>
 
                                 <Button
                                     variant='outlined'
-                                    onClick={() => { setTouched(false), setIsAddingEntry(false) }}
+                                    onClick={() => { setTouched(false), setIsAddingEntry(false), setInputValueTitle(''), setInputValueDesc('') }}
                                 >
                                     Cancelar
                                 </Button>
@@ -77,6 +94,7 @@ export const NewEntry = () => {
                             startIcon={<AddCircleOutlinedIcon />}
                             fullWidth
                             variant='outlined'
+                            color='primary'
                             onClick={() => { setIsAddingEntry(true), setTouched(false) }}
                         >Agregar Tarea
                         </Button>

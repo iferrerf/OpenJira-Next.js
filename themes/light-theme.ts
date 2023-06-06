@@ -11,7 +11,7 @@ export const lightTheme = createTheme({
         main: '#556cd6',
       },
       secondary: {
-        main: '#FFFFFF',
+        main: grey[800],
       },
       error: {
         main: red.A400,

@@ -1,16 +1,18 @@
 import { ChangeEvent, FC, useContext, useMemo, useState } from 'react';
 import { GetServerSideProps } from 'next';
 
-import { capitalize, Button, Card, CardActions, CardContent, CardHeader, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, TextField, IconButton } from '@mui/material';
+import { capitalize, Button, Card, CardActions, CardContent, CardHeader, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, TextField, IconButton, Avatar } from '@mui/material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 
 import { dbEntries } from '@/database';
 import { Layout } from '@/components/layouts';
 import { Entry, EntryStatus } from '@/interfaces';
-import { EntriesContext, EntriesProvider } from '@/context/entries';
+import { EntriesContext } from '@/context/entries';
 import { dateFunctions } from '@/utils';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { ArrowBack } from '@mui/icons-material';
 
 
 const validStatus: EntryStatus[] = ['pending', 'in-progress', 'finished'];
@@ -20,20 +22,29 @@ interface Props {
     entry: Entry
 }
 
-export const EntryPage: FC<Props> = ({entry}) => {
+export const EntryPage: FC<Props> = ({ entry }) => {
 
-    const [inputValue, setInputValue] = useState(entry.description);
-    
-    const [status, setStatus] = useState<EntryStatus>(entry.status);
-    
+    const router = useRouter();
+
+    const [inputValueTitle, setInputValueTitle] = useState('');
+    const [inputValueDescription, setInputValueDescription] = useState('');
+
+    const createdAt = entry.createdAt === undefined ? Date.now().toString : dateFunctions.getFormattedDistanceToNow(entry.createdAt)
+
+    const [status, setStatus] = useState<EntryStatus>('pending');
+
     const [touched, setTouched] = useState(false);
-    
-    const isNotValid = useMemo(() => inputValue.length <= 0 && touched, [inputValue, touched])
-    
-    const {updateEntry, deleteEntry} = useContext(EntriesContext);
 
-    const onInpuetValueChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setInputValue(event.target.value);
+    const isNotValid = useMemo(() => inputValueDescription.length <= 0 && touched, [inputValueDescription, touched])
+
+    const { updateEntry, deleteEntry } = useContext(EntriesContext);
+
+    const onInputValueChangeTitle = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setInputValueTitle(event.target.value);
+    }
+
+    const onInputValueChangeDescription = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setInputValueDescription(event.target.value);
     }
 
     const onStatusChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -42,15 +53,18 @@ export const EntryPage: FC<Props> = ({entry}) => {
 
     const onSave = () => {
 
-        if (inputValue.trim().length === 0) return;
+        if (inputValueDescription.trim().length === 0) return;
 
         const updatedEntry: Entry = {
             ...entry,
-            status : status,
-            description: inputValue
+            status: status,
+            description: inputValueDescription,
+            title: inputValueTitle
         }
 
         updateEntry(updatedEntry, true);
+
+        router.push('/');
 
     }
 
@@ -61,7 +75,7 @@ export const EntryPage: FC<Props> = ({entry}) => {
 
 
     return (
-        <Layout title={inputValue.substring(0,20) + '...'}>
+        <Layout>
             <Grid
                 container
                 justifyContent='center'
@@ -71,7 +85,15 @@ export const EntryPage: FC<Props> = ({entry}) => {
 
                         <CardHeader
                             title={`Entrada:`}
-                            subheader={`Creada hace: ${dateFunctions.getFormattedDistanceToNow(entry.createdAt)}`}
+                            titleTypographyProps={{ variant: 'h5' }}
+                            subheader={`Creada hace: ${createdAt}`}
+                            avatar={
+                                <Avatar
+                                    onClick={() => router.replace('/')}
+                                    sx={{ backgroundColor: '#556cd6', cursor: 'pointer'}}
+                                >
+                                    <ArrowBack />
+                                </Avatar>}
                         />
 
                         <CardContent>
@@ -79,16 +101,30 @@ export const EntryPage: FC<Props> = ({entry}) => {
                             <TextField
                                 sx={{ marginTop: 2, marginBottom: 1 }}
                                 fullWidth
-                                placeholder='Nueva entrada'
+                                placeholder='Titulo'
                                 autoFocus
                                 multiline
-                                label="Nueva entrada"
-                                value={inputValue}
-                                onChange={onInpuetValueChange}
-                                onBlur={() => setTouched(true)} 
+                                label="Titulo"
+                                value={inputValueTitle}
+                                onChange={onInputValueChangeTitle}
+                                onBlur={() => setTouched(true)}
                                 helperText={isNotValid && 'Ingrese un valor'}
                                 error={isNotValid}
-                                />
+                            />
+
+                            <TextField
+                                sx={{ marginTop: 2, marginBottom: 1 }}
+                                fullWidth
+                                placeholder='Descripcion'
+                                autoFocus
+                                multiline
+                                label="Descripcion"
+                                value={inputValueDescription}
+                                onChange={onInputValueChangeDescription}
+                                onBlur={() => setTouched(true)}
+                                helperText={isNotValid && 'Ingrese un valor'}
+                                error={isNotValid}
+                            />
 
                             <FormControl>
                                 <FormLabel>Estado:</FormLabel>
@@ -108,51 +144,52 @@ export const EntryPage: FC<Props> = ({entry}) => {
                                     }
                                 </RadioGroup>
                             </FormControl>
-
                         </CardContent>
 
                         <CardActions>
+
                             <Button
                                 startIcon={<SaveOutlinedIcon />}
                                 variant='contained'
                                 fullWidth
+                                sx={{ ml: 1 }}
                                 onClick={onSave}
-                                disabled={inputValue.length == 0}
+                                disabled={inputValueDescription.length == 0}
                             > Guardar
-
                             </Button>
-                        </CardActions>
 
+                            <Link href={'/'}>
+                                <IconButton
+                                    size='large'
+                                    sx={{
+                                        '&:hover': {
+                                            backgroundColor: '#b71c1c',
+                                            color: 'white',
+                                        },
+                                        margin: 1,
+                                        backgroundColor: 'red',
+                                        color: 'white',
+                                    }}
+                                    onClick={onDelete}>
+                                    <DeleteOutlineOutlinedIcon />
+                                </IconButton>
+                            </Link>
+
+                        </CardActions>
                     </Card>
                 </Grid>
-
-                <Link href={'/'}>
-                <IconButton
-                size='large'
-                sx={{
-                    position:'fixed',
-                    bottom: 50,
-                    right: 50,
-                    backgroundColor: 'red',
-                    color: 'white',
-                }}
-                onClick={onDelete}>
-                    <DeleteOutlineOutlinedIcon/>
-                </IconButton>
-                </Link>
-
             </Grid>
-
         </Layout>
     );
 }
 
 
-export const getServerSideProps: GetServerSideProps = async ({params}) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
-    const {id} = params as { id: string};
+    const { id } = params as { id: string };
 
     const entry = await dbEntries.getEntryId(id);
+    console.log({entry});
 
     if (!entry) {
         return {
@@ -165,7 +202,7 @@ export const getServerSideProps: GetServerSideProps = async ({params}) => {
 
     return {
         props: {
-             entry
+            entry
         }
     }
 }
