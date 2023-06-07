@@ -19,9 +19,10 @@ export default function HomePage() {
           <CardHeader
               sx={{
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
+                alignItems: 'start',
+                justifyContent: 'start',
+                textAlign: 'start',
+                pl: 10
               }}
               avatar={
                 <Avatar sx={{backgroundColor:blue[300]}}>
@@ -44,9 +45,10 @@ export default function HomePage() {
             <CardHeader
               sx={{
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
+                alignItems: 'start',
+                justifyContent: 'start',
+                textAlign: 'start',
+                pl: 10
               }}
               avatar={
                 <Avatar sx={{backgroundColor:grey[500]}}>
@@ -68,9 +70,10 @@ export default function HomePage() {
           <CardHeader
               sx={{
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
+                alignItems: 'start',
+                justifyContent: 'start',
+                textAlign: 'start',
+                pl: 10
               }}
               avatar={
                 <Avatar sx={{backgroundColor:green[400]}}>

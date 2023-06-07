@@ -1,35 +1,38 @@
 import { ChangeEvent, FC, useContext, useMemo, useState } from 'react';
-import { GetServerSideProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 
-import { capitalize, Button, Card, CardActions, CardContent, CardHeader, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, TextField, IconButton, Avatar } from '@mui/material';
+import { capitalize, Button, Card, CardActions, CardContent, CardHeader, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, TextField, IconButton, Avatar, colors, useTheme } from '@mui/material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 
 import { dbEntries } from '@/database';
 import { Layout } from '@/components/layouts';
-import { Entry, EntryStatus } from '@/interfaces';
+import { EntryStatus } from '@/interfaces';
 import { EntriesContext } from '@/context/entries';
 import { dateFunctions } from '@/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ArrowBack } from '@mui/icons-material';
+import { IEntry } from '@/models';
 
 
 const validStatus: EntryStatus[] = ['pending', 'in-progress', 'finished'];
 
 
 interface Props {
-    entry: Entry
+    entry: IEntry;
 }
 
 export const EntryPage: FC<Props> = ({ entry }) => {
 
+    console.log({ entryyyyy: entry });
+
     const router = useRouter();
 
-    const [inputValueTitle, setInputValueTitle] = useState('');
-    const [inputValueDescription, setInputValueDescription] = useState('');
+    const [inputValueTitle, setInputValueTitle] = useState(entry.title || '');
+    const [inputValueDescription, setInputValueDescription] = useState(entry.description || '');
 
-    const createdAt = entry.createdAt === undefined ? Date.now().toString : dateFunctions.getFormattedDistanceToNow(entry.createdAt)
+    const createdAt = entry.createdAt === undefined ? Date.now().toString : dateFunctions.getFormattedDistanceToNow(entry.createdAt || 0);
 
     const [status, setStatus] = useState<EntryStatus>('pending');
 
@@ -38,6 +41,13 @@ export const EntryPage: FC<Props> = ({ entry }) => {
     const isNotValid = useMemo(() => inputValueDescription.length <= 0 && touched, [inputValueDescription, touched])
 
     const { updateEntry, deleteEntry } = useContext(EntriesContext);
+
+    const theme = useTheme();
+    const avatarColor = theme.palette.primary.main;
+
+    if (!entry || !entry.title || !entry.description) {
+        return <div>Cargando entradas...</div>
+    }
 
     const onInputValueChangeTitle = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setInputValueTitle(event.target.value);
@@ -55,7 +65,7 @@ export const EntryPage: FC<Props> = ({ entry }) => {
 
         if (inputValueDescription.trim().length === 0) return;
 
-        const updatedEntry: Entry = {
+        const updatedEntry: IEntry = {
             ...entry,
             status: status,
             description: inputValueDescription,
@@ -70,9 +80,7 @@ export const EntryPage: FC<Props> = ({ entry }) => {
 
     const onDelete = () => {
         deleteEntry(entry._id);
-
     }
-
 
     return (
         <Layout>
@@ -82,7 +90,6 @@ export const EntryPage: FC<Props> = ({ entry }) => {
                 sx={{ marginTop: 2 }}>
                 <Grid item xs={12} sm={8} md={6} >
                     <Card>
-
                         <CardHeader
                             title={`Entrada:`}
                             titleTypographyProps={{ variant: 'h5' }}
@@ -90,7 +97,7 @@ export const EntryPage: FC<Props> = ({ entry }) => {
                             avatar={
                                 <Avatar
                                     onClick={() => router.replace('/')}
-                                    sx={{ backgroundColor: '#556cd6', cursor: 'pointer'}}
+                                    sx={{ backgroundColor: avatarColor, cursor: 'pointer' }}
                                 >
                                     <ArrowBack />
                                 </Avatar>}
@@ -116,7 +123,6 @@ export const EntryPage: FC<Props> = ({ entry }) => {
                                 sx={{ marginTop: 2, marginBottom: 1 }}
                                 fullWidth
                                 placeholder='Descripcion'
-                                autoFocus
                                 multiline
                                 label="Descripcion"
                                 value={inputValueDescription}
@@ -184,28 +190,87 @@ export const EntryPage: FC<Props> = ({ entry }) => {
 }
 
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+// export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
+//     const { id } = params as { id: string };
+
+//     const entry = await dbEntries.getEntryId(id);
+
+//     if (!entry) {
+//         return {
+//             redirect: {
+//                 destination: '/',
+//                 permanent: false
+//             }
+//         }
+//     }
+
+//     return {
+//         props: {
+//             entry
+//         }
+//     }
+// }
+
+// export const getStaticPaths: GetStaticPaths = async () => {
+
+//     const EntryIds = await dbEntries.getEntryIds();
+
+    
+//     const formattedEntryIds = EntryIds.map((entry) => ({
+//         _id: entry._id.toString(),
+//     }));
+
+//     console.log(formattedEntryIds)
+    
+//     return {
+//         paths: formattedEntryIds.map(({ _id }) => ({
+//             params: {
+//                 _id: _id.toString(),
+//             }
+//         })),
+//         fallback: 'blocking'
+//     }
+// }
+
+export const getStaticPaths: GetStaticPaths = async () => {
+    const EntryIds = await dbEntries.getEntryIds();
+  
+    const formattedEntryIds = EntryIds.map((entry) => ({
+      params: {
+        id: entry._id.toString(),
+      },
+    }));
+  
+    return {
+      paths: formattedEntryIds,
+      fallback: 'blocking',
+    };
+  };
+
+
+// Implementa la función getStaticProps para obtener los datos necesarios en tiempo de compilación
+export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
     const { id } = params as { id: string };
 
+    // Obtén la entrada correspondiente al ID desde tu base de datos
     const entry = await dbEntries.getEntryId(id);
-    console.log({entry});
 
     if (!entry) {
         return {
             redirect: {
                 destination: '/',
-                permanent: false
-            }
-        }
+                permanent: false,
+            },
+        };
     }
 
+    // Devuelve los datos obtenidos como props para tu componente de página
     return {
         props: {
-            entry
-        }
-    }
-}
-
+            entry,
+        },
+    };
+};
 
 export default EntryPage;

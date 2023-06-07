@@ -4,6 +4,7 @@ import { grey, red } from '@mui/material/colors';
 export const lightTheme = createTheme({
     palette: {
       mode: 'light',
+
       background: {
         default: grey[300],
       },
@@ -11,7 +12,7 @@ export const lightTheme = createTheme({
         main: '#556cd6',
       },
       secondary: {
-        main: grey[800],
+        main: grey[400],
       },
       error: {
         main: red.A400,

@@ -1,7 +1,8 @@
 import { UIContext } from '@/context/ui';
 import { Entry } from '@/interfaces'
 import { dateFunctions } from '@/utils';
-import { Card, CardActionArea, CardActions, CardContent, Typography } from '@mui/material'
+import { Card, CardActionArea, CardActions, CardContent, Typography, useTheme } from '@mui/material'
+import { blue } from '@mui/material/colors';
 import { Router, useRouter } from 'next/router';
 import React, { DragEvent, FC, useContext } from 'react'
 
@@ -28,6 +29,9 @@ export const EntryCard: FC<Props> = ({ entry }) => {
     router.push(`/entries/${entry._id}`);
   }
 
+  const theme = useTheme();
+  const textColor = theme.palette.primary.main; 
+
   return (
     <Card
       sx={{ marginBottom: 1 }}
@@ -39,7 +43,7 @@ export const EntryCard: FC<Props> = ({ entry }) => {
     >
       <CardActionArea>
         <CardContent>
-          <Typography sx={{ whiteSpace: 'pre-line' }} variant='body1'><strong>{'<>'} {entry.title}</strong></Typography>
+          <Typography sx={{ whiteSpace: 'pre-line', color: textColor }} variant='overline'><strong>{'>>'} {entry.title} </strong></Typography>
           <Typography sx={{ whiteSpace: 'pre-line' }} variant='body2'>{entry.description}</Typography>
         </CardContent>
 

@@ -1,23 +1,19 @@
 
 import { db } from '@/database';
-import Entry, { IEntry } from '@/models/Entry';
-import mongoose from 'mongoose';
+import { Entry, IEntry } from '@/models';
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data =
     | { message: string }
     | IEntry
 
-export default function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<Data>
-) {
+export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
 
-    const { id } = req.query;
+    // const { id } = req.query;
 
-    if (!mongoose.isValidObjectId(id)) {
-        return res.status(400).json({ message: 'ID no válido' });
-    }
+    // if (!mongoose.isValidObjectId(id)) {
+    //     return res.status(400).json({ message: 'ID no válido' });
+    // }
 
     switch (req.method) {
         case 'PUT':
@@ -30,8 +26,6 @@ export default function handler(
             return res.status(400).json({ message: 'End Point no válido ' + req.method });
 
     }
-
-
 }
 
 const getEntry = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -41,6 +35,7 @@ const getEntry = async (req: NextApiRequest, res: NextApiResponse) => {
     await db.connect();
 
     const entry = await Entry.findById(id);
+
     await db.disconnect();
 
     if (!entry) {
@@ -48,7 +43,6 @@ const getEntry = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     return res.status(200).json(entry);
-
 
 }
 
@@ -96,6 +90,7 @@ const deleteEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     try {
         const entryToDelete = await Entry.findByIdAndRemove(id);
         res.status(200).json(entryToDelete!);
+        await db.disconnect();
 
     } catch (error: any) {
         console.log(error);

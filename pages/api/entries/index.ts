@@ -1,8 +1,7 @@
 
 import { db } from '@/database';
-import Entry from '@/models/Entry';
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { EntryModel, IEntry } from '@/models';
+import { Entry, IEntry } from '@/models';
 
 
 type Data =
@@ -39,7 +38,7 @@ const postEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
         return res.status(400).json({ message: 'La descripción es requerida' });
     }
 
-    const newEntry = new EntryModel({
+    const newEntry = new Entry({
         title,
         description,
         createdAt: Date.now(),
@@ -63,10 +62,15 @@ const postEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 }
 
 const getEntries = async (res: NextApiResponse<Data>) => {
-
-    await db.connect();
-    const entries = await Entry.find().sort({ createdAt: 'ascending' });
-    await db.disconnect();
-
-    return res.status(200).json(entries);
-}
+    try {
+      await db.connect(); // Establecer conexión antes de realizar la consulta
+      const entries = await Entry.find().sort({ createdAt: 'ascending' });
+      await db.disconnect(); // Desconectar después de completar la consulta
+  
+      return res.status(200).json(entries);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: 'Error al obtener las entradas' });
+    }
+  };
+  

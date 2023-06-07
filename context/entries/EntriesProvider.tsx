@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react';
+import { FC, useEffect, useReducer, useState } from 'react';
 import { entriesReducer, EntriesContext } from './';
 import { Entry } from '@/interfaces';
 import { entriesAPI } from '@/apis';
@@ -7,7 +7,6 @@ import { useSnackbar } from 'notistack';
 export interface EntriesState {
     entries: Entry[];
 }
-
 
 const Entries_INITIAL_STATE: EntriesState = {
     entries: [],
@@ -18,6 +17,8 @@ export const EntriesProvider = ({ children }: any) => {
     const [state, dispatch] = useReducer(entriesReducer, Entries_INITIAL_STATE);
 
     const { enqueueSnackbar } = useSnackbar();
+
+    const [isLoaded, setIsLoaded] = useState(false);
 
     const addNewEntry = async (title:string, description: string) => {
         try {
@@ -57,7 +58,7 @@ export const EntriesProvider = ({ children }: any) => {
     }
 
 
-    const refreshEntries = async () => {
+    const getEntries = async () => {
         const { data } = await entriesAPI.get<Entry[]>('/entries');
         dispatch({ type: '[Entry] Refresh-Data', payload: data });
     }
@@ -72,17 +73,21 @@ export const EntriesProvider = ({ children }: any) => {
         }
     }
 
+
     useEffect(() => {
-        refreshEntries();
-    }, []);
+        getEntries();
+        setIsLoaded(true);
+    }, [isLoaded]);
 
 
     return (
         <EntriesContext.Provider value={{
             ...state,
+
             addNewEntry,
             updateEntry,
             deleteEntry,
+            getEntries,
         }}>
             {children}
         </EntriesContext.Provider>
