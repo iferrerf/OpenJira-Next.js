@@ -1,5 +1,5 @@
 import { ChangeEvent, FC, useContext, useMemo, useState } from 'react';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next';
 
 import { capitalize, Button, Card, CardActions, CardContent, CardHeader, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, TextField, IconButton, Avatar, colors, useTheme } from '@mui/material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
@@ -190,87 +190,67 @@ export const EntryPage: FC<Props> = ({ entry }) => {
 }
 
 
-// export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
-//     const { id } = params as { id: string };
-
-//     const entry = await dbEntries.getEntryId(id);
-
-//     if (!entry) {
-//         return {
-//             redirect: {
-//                 destination: '/',
-//                 permanent: false
-//             }
-//         }
-//     }
-
-//     return {
-//         props: {
-//             entry
-//         }
-//     }
-// }
-
-// export const getStaticPaths: GetStaticPaths = async () => {
-
-//     const EntryIds = await dbEntries.getEntryIds();
-
-    
-//     const formattedEntryIds = EntryIds.map((entry) => ({
-//         _id: entry._id.toString(),
-//     }));
-
-//     console.log(formattedEntryIds)
-    
-//     return {
-//         paths: formattedEntryIds.map(({ _id }) => ({
-//             params: {
-//                 _id: _id.toString(),
-//             }
-//         })),
-//         fallback: 'blocking'
-//     }
-// }
-
-export const getStaticPaths: GetStaticPaths = async () => {
-    const EntryIds = await dbEntries.getEntryIds();
-  
-    const formattedEntryIds = EntryIds.map((entry) => ({
-      params: {
-        id: entry._id.toString(),
-      },
-    }));
-  
-    return {
-      paths: formattedEntryIds,
-      fallback: 'blocking',
-    };
-  };
-
-
-// Implementa la función getStaticProps para obtener los datos necesarios en tiempo de compilación
-export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
     const { id } = params as { id: string };
 
-    // Obtén la entrada correspondiente al ID desde tu base de datos
     const entry = await dbEntries.getEntryId(id);
 
     if (!entry) {
         return {
             redirect: {
                 destination: '/',
-                permanent: false,
-            },
-        };
+                permanent: false
+            }
+        }
     }
 
-    // Devuelve los datos obtenidos como props para tu componente de página
     return {
         props: {
-            entry,
-        },
-    };
-};
+            entry
+        }
+    }
+}
+
+
+// export const getStaticPaths: GetStaticPaths = async () => {
+//     const EntryIds = await dbEntries.getEntryIds();
+  
+//     const formattedEntryIds = EntryIds.map((entry) => ({
+//       params: {
+//         id: entry._id.toString(),
+//       },
+//     }));
+  
+//     return {
+//       paths: formattedEntryIds,
+//       fallback: 'blocking',
+//     };
+//   };
+
+
+// // Implementa la función getStaticProps para obtener los datos necesarios en tiempo de compilación
+// export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
+//     const { id } = params as { id: string };
+
+//     // Obtén la entrada correspondiente al ID desde tu base de datos
+//     const entry = await dbEntries.getEntryId(id);
+
+//     if (!entry) {
+//         return {
+//             redirect: {
+//                 destination: '/',
+//                 permanent: false,
+//             },
+//         };
+//     }
+
+//     // Devuelve los datos obtenidos como props para tu componente de página
+//     return {
+//         props: {
+//             entry,
+//         },
+//     };
+// };
 
 export default EntryPage;
